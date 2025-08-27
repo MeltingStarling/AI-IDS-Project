@@ -1,0 +1,34 @@
+My specific ChatGPT link for the main parts of this project is from here: https://chatgpt.com/share/67cf6a46-da88-8012-83ad-599eccfca53d
+
+
+The first thing that I set up was figuring out how to set up and train an AI model. ChatGPT helped by explaining that there are many different types, and depending on the type of problem I'm trying to fix, I'm going to change what I need to do to set up my AI. 
+
+So, I then tell ChatGPT my problem. I'd like to create an AI that will sit in my homelab and check the network constantly to see if there are any red flags thrown or errors that look malicious through an IDS system. 
+More specifically, I prompted ChatGPT with this: Sure, I'd like to do a beginner-friendly approach where it's a network-based IDS, where unsupervised anomaly detection is what I'm aiming for. I'll use the public IDS datasets that you recommended (When the time comes, I'll ask for the link), and I'll use random Forest for training the model as you suggested. I'll be launching this on a VM that is hosted on my Tailscale SSH'd Ubuntu VM(on my homelab), and then I'll ask which you think would be better between Suricata or Snort so that I can get some more experience with an IDS system. I like your idea of adding this to my GitHub. As we go through this project together, please inform me of something like "Hey, I think this would be a great time to add step #n+1, where n starts at 0 and increases each time we finish a step. 
+ChatGPT broke down my steps into a more understandable structure, starting with step #0.
+
+It tells me this in 9 simple steps: 
+0. Set up VM on homelab with git, Python, and Python packages.
+1. Define Your Objective
+2. Choose the Type of AI Model
+3. Gather and Prepare Data
+4. Choose a Machine Learning Framework
+5. Build Your AI Model
+6. Train and Evaluate the Model
+7. Deploy the AI Model
+8. Monitor and Improve
+
+Further explanations:
+As previously stated, Step #0 consists of me setting up my Ubuntu VM that is hosted on my homelab, setting it up with things like git, Python, and the necessary Python packages.
+
+Step 1 included finding the right dataset to train my AI model on. Knowing that there were many options out there, I chose to go with an official model of network traffic from the Australian government, namely “UNSW-NB15,” which has a mix of both normal and "attack" traffic. This data set can be obtained here [https://research.unsw.edu.au/projects/unsw-nb15-dataset], and I specifically used the NUSW-NB15_features.csv and UNSW-NB15 files. After downloading the files, I got to work prompting ChatGPT with questions of what to do next, which directed me towards starting to program in Python using VSCode. I started with errors caused by the dataset didn’t start with proper headers, so the pandas import from Python was having issues being able to figure out what data was useful and where it started. Eventually, I figured out that the error "AttributeError: Can only use .str accessor with string values!" was given because the “.str.strip()” of pandas was forcing the columns into strings after they were already being loaded in. So by forcefully converting all column names to strings before applying “.str.strip()” I was able to correctly get the output that I wanted.
+
+This lead to me hitting step 2, “Data Preprocessing”, which included dropping some useless data since they change dynamically, converting categorical data into numerical values using label encoding for machine learning and, labeling columns with no attacks as “0” and those with attacks as “1”. Lastly, I set 80% of the data as a training set and 20% as a testing set. This part of the project originally was getting an error “NameError: name 'df' is not defined” where the variable “df” was not being understood by Python for whatever reason. Without changing the code and only adding print statements to debug, I restarted my VSCode and was able to properly load the dataset, and in doing so, finished part#2 and started part#3.
+
+Part 3: Since my dataset is now preprocessed, I’m going to train the random forest model for unsupervised anomaly detection, and since random forest is inherently a supervised model, I asked ChatGPT to tweak it for anomaly detection by treating attack traffic as anomalies (1) and normal traffic as regular data (0). From here on, I recovered my lost data and moved forward with the next step. That being Model Optimization & Hyperparameter Tuning.
+
+Starting step 4, I was given three options at this point: I could do simple tuning with GridSearchCV (which will be slower and more exhaustive), or use RandomizedSearchCV (which is faster and good enough for most projects), or lastly, I could manually tweak parameters. I decided that using RandomizedSearchCV would be great since I already don’t have a lot of experience in this field, and this would be my first step into learning anything about AI/ML, and since I knew I wanted to put this into real use on my homelab. Essentially, by utilizing RandomizedSearchCV, I will be “Trying 20 random combinations instead of checking every possible one at a time,” which will be “good enough” since this is a project and not an assignment. At this point, I’m now cleared for step #5 since randomizedSearchCV runs properly. 
+
+Step 5 entails exporting my model, moving it to my Ubuntu VM, and integrating it with my IDS system by using Suricata or Snort. I chose to use Suricata since it works better with JSON files and multithreading. Furthermore, it seems that more places use Suricata than Snort from the job searching that I've currently done.	This could also just be called “Saving the model and prepping for deployment.”. However, at this point, I was receiving errors, and by adding joblib, I was able to fix those. Next was to save the trained model, the scaler, and the encoders; all that was left to do was move it over to the Ubuntu VM.
+
+Step 6
