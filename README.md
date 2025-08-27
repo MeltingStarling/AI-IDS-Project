@@ -1,0 +1,1 @@
+Hello! This project is one that I worked on for a long time and am really excited to share with everyone. I chose to start this as an Information Technology student who loves anything tech and really wanted to dip my feet into AI while also learning real cybersecurity tools and seeing if I can put this information to use for later.
