@@ -19,20 +19,6 @@ Ubuntu VM inside a homelab, SSH-accessible via Tailscale
 
 The goal of this project was to build a fully functional IDS using machine learning, capable of analyzing live network traffic and reporting suspicious behavior instantly.
 
-This is Phase 1 of a multi-phase project, with future expansion planned to cover the entire home network via NIC mirroring, gateway routing, and Discord bot integration.
-+--------------------+        +-----------------------+       +-----------------+
-|   Network Traffic  | -----> |       Suricata        | ----> |     eve.json    |
-+--------------------+        +-----------------------+       +-----------------+
-                                         |
-                                         v
-                                +------------------+
-                                |  AI-IDS Detector |
-                                |  (Python + ML)   |
-                                +------------------+
-                                   |          |
-                                   v          v
-                          anomalies.jsonl   Discord Alerts
-
 Dataset: UNSW-NB15
 
 This project uses the UNSW-NB15 dataset — a widely used public dataset containing both normal and malicious traffic types.
