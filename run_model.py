@@ -12,7 +12,7 @@ EVE = "/var/log/suricata/eve.json"
 MODEL_PATH = "models/ids_model.joblib"
 THRESH = 0.5  # threshold if predict_proba is available
 
-DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1441114252155818128/FIDCaUDl9FONDDdIBxI_IflUnOSNhGLno9K11iZFsfPUxUiIUSf5kAWx9QaUE0d0Fe_u"
+DISCORD_WEBHOOK_URL = "YOURDISCORDWEBHOOKGOESHERE"
 
 def send_discord_alert(record: dict):
     if not DISCORD_WEBHOOK_URL:
