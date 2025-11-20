@@ -1,6 +1,9 @@
 AI-Based Intrusion Detection System (AI-IDS)
 Machine Learning + Suricata + Real-Time Discord Alerts
 
+AI-Based Intrusion Detection System (AI-IDS)
+Machine Learning + Suricata + Real-Time Discord Alerts
+
 This project implements a fully functional, real-time AI-powered Intrusion Detection System (IDS) using:
 
 Suricata for network flow event generation
@@ -17,7 +20,7 @@ This project is designed, implemented, and deployed entirely in a homelab enviro
 
 Project Overview
 
-The goal of this project was to design, train, and deploy a machine learning model capable of detecting anomalous or potentially malicious network behavior in a home network.
+The goal of this project was to design, train, and deploy a machine learning model capable of detecting potentially malicious network behavior in a home network.
 
 This system:
 
@@ -27,11 +30,7 @@ Extracts features from Suricata flow events
 
 Scores each flow using a trained ML model
 
-Logs anomalies
-
-Sends alerts to Discord
-
-Runs continuously
+Logs anomalies, sends alerts to Discord, and runs continuously
 
 It also opens the door for Phase 2 enhancements, including full network coverage, dashboards, and bot-controlled monitoring.
 
@@ -58,19 +57,12 @@ https://research.unsw.edu.au/projects/unsw-nb15-dataset
 The UNSW-NB15 dataset includes:
 
 Normal traffic
-
 Fuzzers
-
 Analysis
-
 DoS
-
 Shellcode
-
 Reconnaissance
-
 Generic attacks
-
 Backdoor traffic
 
 Each sample includes 49 features + labels indicating whether the behavior is benign (0) or malicious (1).
@@ -131,7 +123,7 @@ Deployment Architecture (Local VM)
 
 The inference engine runs on an Ubuntu VM in my homelab and uses:
 
-suricata for network monitoring
+Suricata for network monitoring
 
 eve.json as the event stream
 
@@ -151,7 +143,8 @@ sends Discord notifications,
 
 runs as a persistent systemd service.
 
-Systemd service example:
+Keeps service running indefinitely regardless of failure
+Systemd service example: 
 [Unit]
 Description=AI-IDS Suricata Anomaly Detector
 After=network.target suricata.service
@@ -160,13 +153,12 @@ After=network.target suricata.service
 Type=simple
 User=joshua
 WorkingDirectory=/home/joshua/ai-ids-new
-ExecStart=/home/joshua/ai-ids-new/.venv/bin/python /home/joshua/ai-ids-new/run_model.py
+ExecStart=/home/joshua/ai-ids-new/.venv/bin/python/home/joshua/ai-ids-new/run_model.py
 Restart=always
 RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
-
 
 Activated via:
 
@@ -219,7 +211,7 @@ Monitor LAN-wide traffic
 
 Phase 3 — Advanced Features
 
-Build Discord bot with commands:
+Build a Discord bot with commands:
 
 /aiids status
 
