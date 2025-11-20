@@ -1,0 +1,256 @@
+AI-Based Intrusion Detection System (AI-IDS)
+Machine Learning + Suricata + Real-Time Discord Alerts
+
+This project implements a fully functional, real-time AI-powered Intrusion Detection System (IDS) using:
+
+Suricata for network flow event generation
+
+A Random Forest–based anomaly-detection model trained on the UNSW-NB15 dataset
+
+A Python inference engine tailing Suricata's eve.json
+
+Discord webhook alerts for real-time threat notifications
+
+systemd service for continuous 24/7 operation
+
+This project is designed, implemented, and deployed entirely in a homelab environment, running on an Ubuntu VM accessed via Tailscale SSH.
+
+Project Overview
+
+The goal of this project was to design, train, and deploy a machine learning model capable of detecting anomalous or potentially malicious network behavior in a home network.
+
+This system:
+
+Monitors network traffic in real time, 
+
+Extracts features from Suricata flow events
+
+Scores each flow using a trained ML model
+
+Logs anomalies
+
+Sends alerts to Discord
+
+Runs continuously
+
+It also opens the door for Phase 2 enhancements, including full network coverage, dashboards, and bot-controlled monitoring.
+
++--------------------+        +-----------------------+       +-----------------+
+|   Network Traffic  | -----> |       Suricata        | ----> |     eve.json    |
++--------------------+        +-----------------------+       +-----------------+
+                                         |
+                                         v
+                                +------------------+
+                                |  AI-IDS Detector |
+                                |  (Python + ML)   |
+                                +------------------+
+                                   |          |
+                                   v          v
+                          anomalies.jsonl   Discord Alerts
+
+Dataset Used: UNSW-NB15
+
+The model is trained on the UNSW-NB15 dataset, one of the standard public datasets for IDS research.
+
+Dataset source:
+https://research.unsw.edu.au/projects/unsw-nb15-dataset
+
+The UNSW-NB15 dataset includes:
+
+Normal traffic
+
+Fuzzers
+
+Analysis
+
+DoS
+
+Shellcode
+
+Reconnaissance
+
+Generic attacks
+
+Backdoor traffic
+
+Each sample includes 49 features + labels indicating whether the behavior is benign (0) or malicious (1).
+
+Model Training Summary
+
+Step 1 — Objective
+
+Build an IDS using machine learning capable of anomaly detection in real time.
+
+Step 2 — Model Choice
+
+Random Forest classifier (supervised learning) adapted for anomaly scoring.
+
+Although I initially requested an unsupervised approach, we used supervised labels (0 = normal, 1 = attack) because UNSW-NB15 provides labeled attack traffic.
+
+Step 3 — Data Preprocessing
+
+Loaded the CSV files with pandas
+
+Fixed header format errors
+
+Cleaned the data
+
+Converted categorical features with label encoding
+
+Split dataset (80% training, 20% testing)
+
+Converted feature names to strings
+
+Removed dynamically changing metadata not useful during inference
+
+Step 4 — Hyperparameter Tuning
+
+Used RandomizedSearchCV, which is faster than GridSearchCV and more appropriate for a first ML deployment.
+
+Sample hyperparameters tuned:
+
+n_estimators
+
+max_depth
+
+max_features
+
+min_samples_split
+
+Step 5 — Model Export
+
+Saved the model using joblib:
+
+ids_model.joblib
+
+This file is deployed to the Ubuntu VM in:
+
+~/ai-ids-new/models/
+
+Deployment Architecture (Local VM)
+
+The inference engine runs on an Ubuntu VM in my homelab and uses:
+
+suricata for network monitoring
+
+eve.json as the event stream
+
+A Python script (run_model.py) that:
+
+tails eve.json,
+
+converts flow events into ML feature vectors,
+
+scores events,
+
+prints anomalies,
+
+logs them to anomalies.jsonl,
+
+sends Discord notifications,
+
+runs as a persistent systemd service.
+
+Systemd service example:
+[Unit]
+Description=AI-IDS Suricata Anomaly Detector
+After=network.target suricata.service
+
+[Service]
+Type=simple
+User=joshua
+WorkingDirectory=/home/joshua/ai-ids-new
+ExecStart=/home/joshua/ai-ids-new/.venv/bin/python /home/joshua/ai-ids-new/run_model.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+
+Activated via:
+
+sudo systemctl daemon-reload
+sudo systemctl enable ai-ids.service
+sudo systemctl start ai-ids.service
+
+Real-Time Discord Alerts
+
+The system posts alerts like this:
+🚨 AI-IDS Anomaly Detected 🚨
+Time: 2025-11-20T19:58:43Z
+Src: 192.168.1.50:54321
+Dst: 142.250.72.14:80
+Proto: tcp
+Score: 0.943
+This makes the system truly real-time and actionable.
+
+To test model behavior and see live flow scoring:
+curl http://example.com
+sudo nmap -sS 127.0.0.1 -p 1-200
+
+Watched via:
+sudo journalctl -u ai-ids.service -f
+
+And anomalies logged here:
+~/ai-ids-new/anomalies.jsonl
+
+Threshold tuning (from 0.7 → 0.5 → 0.3) allowed more events to be flagged, confirming the pipeline.
+
+Repository Structure
+ai-ids/
+│
+├── models/
+│   └── ids_model.joblib
+│
+├── run_model.py
+├── IDS_Training_Model.py
+├── README.md
+└── Documentation/
+
+Future Work (Phase 2, Phase 3, Phase 4)
+Phase 2 — Full Network Monitoring
+
+Deploy Suricata on router/gateway
+
+Use SPAN/mirror port
+
+Monitor LAN-wide traffic
+
+Phase 3 — Advanced Features
+
+Build Discord bot with commands:
+
+/aiids status
+
+/aiids anomalies
+
+/aiids last 10
+
+Add whitelisting + suppression logic
+
+Add auto-threshold tuning
+
+Phase 4 — Dashboard & Analytics
+
+Grafana dashboard (flows, anomalies over time)
+
+Loki or Elasticsearch for log indexing
+
+Live monitoring charts
+
+Conclusion
+
+This project demonstrates:
+
+Real ML model training on real network traffic data
+
+Live threat detection using Suricata
+
+Automation via systemd
+
+Practical alerting via Discord
+
+Real-world deployment in a homelab environment
+
+It demonstrates the ability to design, build, debug, deploy, and maintain a real security detection pipeline, similar to what SOC analysts and detection engineers use in industry.
